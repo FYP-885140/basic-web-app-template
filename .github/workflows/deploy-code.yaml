@@ -1,0 +1,39 @@
+on:
+  push:
+    branches:
+      - main
+      - test
+      - dev
+
+env:
+  AZURE_WEBAPP_NAME: "${{ github.event.repository.name }}-"${GITHUB_REF##*/}-app"
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  NODE_VERSION: '12.x'
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: npm install, build, and test
+        run: |
+          # Build and test the project, then
+          # deploy to Azure Web App.
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+
+      - name: 'Deploy to Azure WebApp'
+        uses: azure/webapps-deploy@0b651ed7546ecfc75024011f76944cb9b381ef1e
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
