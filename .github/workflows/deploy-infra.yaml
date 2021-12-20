@@ -9,6 +9,14 @@ jobs:
   terraform:
     name: "Terraform"
     runs-on: ubuntu-latest
+    env:
+      PROJECT_NAME: ${{ github.event.repository.name }}
+      ENVIRONMENT: ${GITHUB_REF##*/}
+      WORKSPACE_NAME: '${{ github.event.repository.name }}-${GITHUB_REF##*/}'
+
+    defaults:
+      run:
+        working-directory: ./infra
 
     steps:
       - name: Checkout
@@ -26,7 +34,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform init -backend-config "tf_state_workspace=${{ env.WORKSPACE_NAME }}"
       
       - name: Terraform Validate
         id: validate
@@ -42,5 +50,4 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var="tf_state_workspace=${{env.WORKSPACE_NAME}}" -var="environment=${{env.ENVIRONMENT}}" -var="projectName=${{env.PROJECT_NAME}}" || terraform destroy -auto-approve
