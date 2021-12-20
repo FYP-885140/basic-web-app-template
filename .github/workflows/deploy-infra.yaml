@@ -50,4 +50,4 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var="tf_state_workspace=${{env.WORKSPACE_NAME}}" -var="environment=${{env.ENVIRONMENT}}" -var="projectName=${{env.PROJECT_NAME}}" || terraform destroy -auto-approve
+        run: terraform apply -auto-approve -var="tf_state_workspace=${{env.WORKSPACE_NAME}}" -var="environment=${{env.ENVIRONMENT}}" -var="projectName=${{env.PROJECT_NAME}}" -var="app_client_id=${{secrets.DEPLOYMENT_CREDS_ID}}" -var="app_client_secret=${{secrets.DEPLOYMENT_SECRETS_ID}}" || terraform destroy -auto-approve

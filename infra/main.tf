@@ -2,6 +2,17 @@ terraform {
     backend "remote" {}
 }
 
+provider "azurerm"{
+    features {}
+
+    subscription_id = var.app_subscription_id
+    client_id = var.app_client_id
+    client_secret = var.app_client_secret
+    tenant_id = var.app_tenant_id
+    skip_provider_registration = true
+
+}
+
 resource "azurerm_resource_group" "rg" {
     name = "${var.environment}-${var.projectName}"
     location = "West Europe"
