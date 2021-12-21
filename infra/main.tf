@@ -1,5 +1,11 @@
 terraform {
-    backend "remote" {}
+    backend "remote" {
+        organization = "FYP-Bot"
+
+        workspaces {
+            prefix = "project-"
+        }
+    }
 }
 
 provider "azurerm"{
@@ -12,7 +18,6 @@ provider "azurerm"{
     skip_provider_registration = true
 
 }
-
 resource "azurerm_resource_group" "rg" {
     name = "${var.environment}-${var.projectName}"
     location = "West Europe"
@@ -24,6 +29,7 @@ resource "azurerm_app_service_plan" "plan" {
     location = azurerm_resource_group.rg.location
     resource_group_name = azurerm_resource_group.rg.name
     kind = "Linux"
+    reserved = true
     sku {
         tier = "Free"
         size = "F1"
@@ -39,14 +45,4 @@ resource "azurerm_app_service" "app" {
 
 locals {
   prefix = "${var.environment}-${var.projectName}"
-}
-
-data "terraform_remote_state" "state" {
-    backend = "remote"
-    config = {
-        organization = "FYP-Bot"
-        workspaces = {
-            name = "${var.tf_state_workspace}"
-        }
-    }
 }
