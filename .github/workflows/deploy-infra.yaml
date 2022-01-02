@@ -32,10 +32,12 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
+        env: 
+          TF_WORKSPACE: ${{env.WORKSPACE_NAME}}
 
       - name: Terraform Workspace
         id: workspace
-        run: terraform workspace ${{env.WORKSPACE_NAME}}
+        run: terraform workspace select ${{env.WORKSPACE_NAME}}
       
       - name: Terraform Validate
         id: validate
